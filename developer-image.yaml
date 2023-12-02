@@ -1,0 +1,44 @@
+# clear-linux-config
+
+# Switch between aliases if you want to install to an actual block device.
+# i.e /dev/sda
+block-devices: [
+   {name: "installer", file: "dev-clear-installer.img"}
+]
+
+targetMedia:
+- name: ${installer}
+  type: disk
+  children:
+  - name: ${installer}1
+    fstype: vfat
+    mountpoint: /boot
+    size: "150M"
+    type: part
+  - name: ${installer}2
+    fstype: swap
+    size: "256M"
+    type: part
+  - name: ${installer}3
+    fstype: ext4
+    mountpoint: /
+    size: "3.0G"
+    type: part
+
+bundles: [os-core, os-core-update, clr-installer]
+offline: true
+autoUpdate: false
+postArchive: false
+postReboot: false
+telemetry: false
+keyboard: us
+language: en_US.UTF-8
+kernel: kernel-native
+kernel-arguments: {add: [clri.loglevel=4], remove: [console=ttyS0,115200n8]}
+
+pre-install: [
+   {cmd: "${yamlDir}/developer-image-pre.sh"}
+]
+post-install: [
+   {cmd: "${yamlDir}/developer-image-post.sh ${chrootDir}"},
+]
